@@ -25,7 +25,7 @@ object KafkaAvroConsumerService {
   props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, kafkaAvroDeserializer)
   props.put(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, ConfService.SCHEMA_REGISTRY)
   props.put(ConsumerConfig.GROUP_ID_CONFIG, ConfService.GROUP_ID)
-  val autoReset = ??? //@TODO @see https://kafka.apache.org/documentation/#consumerconfigs_auto.offset.reset
+  val autoReset = "earliest" //@TODO @see https://kafka.apache.org/documentation/#consumerconfigs_auto.offset.reset
   props.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, autoReset)
 
   private val consumer = new KafkaConsumer[String, Record](props)
@@ -54,13 +54,13 @@ object KafkaAvroConsumerService {
           messages.forEach(record => {
 
             //@TODO how can we parse the raw data to a News object? @see producer for hints
-            val deserializedValue = ???
-            // Deserialized Value (Class): title ${deserializedValue.title } media ${deserializedValue.media }
+            val deserializedValue = RecordFormat{News}.from(record.value{})
+            // 
             logger.info(
               s"""Consumed :
                  |Offset : ${record.offset()} from partition ${record.partition()}
                  |Unserialized value (raw) : ${record.value()}
-
+                 |Deserialized Value (Class): title ${deserializedValue.title } media ${deserializedValue.media }
                  |Key : ${record.key()}
                  |""".stripMargin)
           })

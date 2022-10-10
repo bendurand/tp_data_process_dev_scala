@@ -88,7 +88,10 @@ object KafkaService  {
   }
 
   //@TODO Read "README.md" file and write
-  //def writeToParquet(ds: Dataset[NewsKafka]) = {
-  //???
-  // }
+  def writeToParquet(ds: Dataset[NewsKafka]) = {
+    ds.writeStream.format("parquet")        // can be "orc", "json", "csv", etc.
+      .option("CheckPointLocation","data/")
+      .option("path", "data/")
+      .start()
+  }
 }
